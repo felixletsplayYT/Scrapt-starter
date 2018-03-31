@@ -5,7 +5,7 @@ import java.net.URL;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class Updater {
-    private final String VERSION_URL = "http://github.io/rfoei/scrapt/update.html";
+    private final String VERSION_URL = "https://raw.githubusercontent.com/rfeoi/Scrapt/master/docs/version.html";
     private String versionString;
     private String updateURL;
     private File version;
@@ -25,10 +25,9 @@ public class Updater {
     private void check() throws IOException {
         URL url = new URL(VERSION_URL);
         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
-        String versionStringWeb = reader.readLine();
+        String version = reader.readLine();
         reader.close();
-        String version = versionStringWeb.split(";")[0];
-        updateURL = versionStringWeb.split(";")[1];
+        updateURL = "https://github.com/rfeoi/Scrapt/releases/download/" + version + "/scrapt.jar";
         if (!version.equals(versionString) || empty == 2){
             update();
             isNew = true;
