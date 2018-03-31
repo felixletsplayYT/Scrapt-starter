@@ -23,8 +23,9 @@ public class MainFrame extends JFrame implements ActionListener{
     public MainFrame() {
         this.setVisible(true);
         try {
-            if (new Updater().isNew()) {
-                JOptionPane.showMessageDialog(null, "Updated!");
+            Updater updater = new Updater();
+            if (updater.isNew()) {
+                JOptionPane.showMessageDialog(null, "Updated! Version: " + updater.getVersionString()+" Description: "+ updater.getUpdateMessage());
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Update error: Check your Internet Connection.");
@@ -67,6 +68,8 @@ public class MainFrame extends JFrame implements ActionListener{
             }
             inputStream.close();
             errorStream.close();
+            start.setEnabled(true);
+            stop.setEnabled(false);
             exit = exec.exitValue();
             exec.destroy();
         } catch (IOException e) {
@@ -85,7 +88,7 @@ public class MainFrame extends JFrame implements ActionListener{
             start.setEnabled(false);
             stop.setEnabled(true);
             //TODO Make JAVA Command dynamic
-            start("java " + System.getProperty("user.home") + File.separatorChar + ".scrapt" + File.separatorChar + "scrapt.jar " + pathToProjectFile.getText());
+            start("java -jar " + System.getProperty("user.home") + File.separatorChar + ".scrapt" + File.separatorChar + "scrapt.jar " + pathToProjectFile.getText());
         }else if (invoker.getText().equals(stop.getText())){
             if (exec.isAlive())exec.destroy();
             start.setEnabled(true);
@@ -110,8 +113,9 @@ public class MainFrame extends JFrame implements ActionListener{
             });
             this.setFocusable(false);
             int i = chooser.showOpenDialog(null);
-            System.out.println(i);//TODO
-            pathToProjectFile.setText(chooser.getSelectedFile().getAbsolutePath());
+            if (i == 0){
+                pathToProjectFile.setText(chooser.getSelectedFile().getAbsolutePath());
+            }
         }
     }
 }
