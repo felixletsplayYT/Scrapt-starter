@@ -1,11 +1,19 @@
 package com.rfeoi.scrapt.launcher.updater;
 
+import jdk.nashorn.api.scripting.JSObject;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class Updater {
-    private final String VERSION_URL = "https://raw.githubusercontent.com/rfeoi/Scrapt/master/docs/version.html";
+    private final String RELEASE_URL = "https://api.github.com/repos/rfeoi/scrapt/releases/latest";
     private String versionString;
     private String updateURL;
     private File version;
@@ -13,7 +21,7 @@ public class Updater {
     private boolean isNew;
     private int empty;
 
-    public Updater() throws IOException {
+    public Updater() throws IOException{
         initialize();
         check();
     }
@@ -23,40 +31,41 @@ public class Updater {
     }
 
     private void check() throws IOException {
-        URL url = new URL(VERSION_URL);
+        URL url = new URL(RELEASE_URL);
         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
-        String version = reader.readLine();
-        reader.close();
-        updateURL = "https://github.com/rfeoi/Scrapt/releases/download/" + version + "/scrapt.jar";
-        if (!version.equals(versionString) || empty == 2){
+        String JSONAnswer = reader.readLine();
+        for (String s : JSONAnswer.split(",")){
+            if (s.contains("\"tag_name\"")){
+                versionString = s.split("\"")[3];
+                break;
+            }
+        }
+        updateURL = "https://github.com/rfeoi/Scrapt/releases/download/" + versionString + "/scrapt.jar";
+        if (!versionString.equals(this.versionString) || empty == 2) {
             update();
             isNew = true;
-        }else if (empty == 1){
-            writeVersionString(version);
+        } else if (empty == 1) {
+            writeVersionString(versionString);
         }
     }
 
     private void writeVersionString(String string) throws IOException {
-        if (version.exists())version.delete();
+        if (version.exists()) version.delete();
         version.createNewFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(version));
         writer.write(versionString);
         writer.close();
     }
+
     private void update() throws IOException {
         URL url = new URL(updateURL);
         if (jar.exists()) jar.delete();
-        jar.createNewFile();
-        InputStream inputStream = url.openConnection().getInputStream();
-        FileWriter writer = new FileWriter(jar);
-        int input;
-        while((input = inputStream.read()) != 0){
-            writer.write(input);
-        }
-        inputStream.close();
-        writer.close();
+        ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+        FileOutputStream fos = new FileOutputStream(jar);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         writeVersionString(versionString);
     }
+
     private void initialize() throws IOException {
         version = new File(System.getProperty("user.home") + File.separatorChar + ".scrapt" + File.separatorChar + "version.txt");
         jar = new File(System.getProperty("user.home") + File.separatorChar + ".scrapt" + File.separatorChar + "scrapt.jar");

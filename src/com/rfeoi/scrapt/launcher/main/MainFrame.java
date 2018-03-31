@@ -2,6 +2,7 @@ package com.rfeoi.scrapt.launcher.main;
 
 import com.rfeoi.scrapt.launcher.updater.Updater;
 
+import javax.script.ScriptException;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -27,6 +28,7 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Update error: Check your Internet Connection.");
+            e.printStackTrace();
         }
         this.setLayout(new GridLayout(4, 1));
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
