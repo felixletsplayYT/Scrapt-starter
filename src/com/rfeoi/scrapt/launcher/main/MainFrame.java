@@ -20,7 +20,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private JButton start;
     private JButton stop;
     private Process exec;
-    public MainFrame() {
+    MainFrame() {
         this.setVisible(true);
         try {
             Updater updater = new Updater();
@@ -49,7 +49,10 @@ public class MainFrame extends JFrame implements ActionListener{
         stop.addActionListener(this);
         this.add(start);
         this.add(stop);
-        this.setSize((int) this.getMaximumSize().getHeight() / 3, (int) this.getMaximumSize().getHeight() / 2);
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int width = gd.getDisplayMode().getWidth();
+        int height = gd.getDisplayMode().getHeight();
+        this.setSize( width / 3,  height / 2);
     }
 
     private int start(String command) {
@@ -101,9 +104,7 @@ public class MainFrame extends JFrame implements ActionListener{
             chooser.setFileFilter(new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    if (f.isDirectory()) return true;
-                    if (f.getName().endsWith(".scrapt")) return true;
-                    return false;
+                    return f.isDirectory() || f.getName().endsWith(".scrapt");
                 }
 
                 @Override

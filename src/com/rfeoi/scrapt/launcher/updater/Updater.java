@@ -1,11 +1,6 @@
 package com.rfeoi.scrapt.launcher.updater;
 
-import jdk.nashorn.api.scripting.JSObject;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
